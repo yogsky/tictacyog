@@ -1,7 +1,6 @@
-import { CellStateOption, WinnerOption } from "../enums";
+import { CellStateOption } from '../enums'
 
-
-const winningCombos = [
+const WIN_COMBOS = [
   [0, 1, 2],
   [3, 4, 5],
   [6, 7, 8],
@@ -9,66 +8,73 @@ const winningCombos = [
   [1, 4, 7],
   [2, 5, 8],
   [0, 4, 8],
-  [2, 4, 6],
-];
+  [2, 4, 6]
+]
 
-const winnerToScore = {
-  [WinnerOption.X]: 100,
-  [WinnerOption.O]: -100,
-  [WinnerOption.TIE]: 0,
-};
+export const getInitialBoard = (): CellStateOption[] =>
+  Array(9)
+    .fill(1)
+    .map(() => CellStateOption.EMPTY)
 
-export const getInitialBoard = (): CellStateOption[] => {
-  const board = Array(9).fill(1).map(() => CellStateOption.EMPTY);
-  const randomInitialIndex = Math.floor(Math.random() * board.length);
-  board[randomInitialIndex] = CellStateOption.X;
-  return board;
-};
+export function setBoardCell (board: CellStateOption[], idx: number, player: CellStateOption) {
+  board[idx] = player
+  return board
+}
 
-export const getWinner = (board: CellStateOption[]): WinnerOption | null => {
-  const isTie = board.every((cell) => cell !== CellStateOption.EMPTY);
-  if (isTie) return WinnerOption.TIE;
-  const winningPath = getWinnerPath(board);
-  if (winningPath.length) return board[winningPath[0]] === CellStateOption.X ? WinnerOption.X : WinnerOption.O;
-  return null;
-};
+export function getWinnerPath (board: CellStateOption[]): number[] | [] {
+  return (
+    (WIN_COMBOS.find((combo) => {
+      const [a, b, c] = combo
+      return board[a] !== CellStateOption.EMPTY && board[a] === board[b] && board[a] === board[c]
+    })) ?? []
+  )
+}
 
-export const getWinnerPath = (board: CellStateOption[]): number[] => {
-  return winningCombos.find((combo) => {
-    const [a, b, c] = combo;
-    return board[a] && board[a] === board[b] && board[a] === board[c];
-  }) || [];
-};
-
-
-const getScoreForPotentialBoard = (board: CellStateOption[], player = CellStateOption.O, depth = 1): number => {
-  const winner = getWinner(board);
-  if (winner) return winnerToScore[winner] / depth;
-  const isAiTurn = player === CellStateOption.X;
-  let bestScore = isAiTurn ? -Infinity : Infinity;
-  const nextPlayer = isAiTurn ? CellStateOption.O : CellStateOption.X;
-  const targetOperation = isAiTurn ? Math.max : Math.min;
-  for (let index = 0; index < board.length; index += 1) {
-    if (board[index] !== CellStateOption.EMPTY) continue;
-    board[index] = player;
-    let score = getScoreForPotentialBoard(board, nextPlayer, depth + 1);
-    board[index] = CellStateOption.EMPTY;
-    bestScore = targetOperation(score, bestScore);
+function checkWinOrBlock (board: CellStateOption[], target: CellStateOption) {
+  // Winning combinations
+  for (let i = 0; i < WIN_COMBOS.length; i++) {
+    const [a, b, c] = WIN_COMBOS[i]
+    if (board[a] === target && board[b] === target && board[c] === '') return c
+    if (board[a] === target && board[c] === target && board[b] === '') return b
+    if (board[b] === target && board[c] === target && board[a] === '') return a
   }
-  return bestScore;
-};
+  return null
+}
+export function getBestAIMove (board: CellStateOption[]) {
+  // Check for a win or block
 
-export const getBestMove = (initialBoard: CellStateOption[]): number => {
-  const board = initialBoard.slice();
-  let best = { index: -1, score: -Infinity };
-  for (let index = 0; index < board.length; index += 1) {
-    if (board[index] !== CellStateOption.EMPTY) continue;
-    board[index] = CellStateOption.X;
-    let score = getScoreForPotentialBoard(board);
-    board[index] = CellStateOption.EMPTY;
-    if (score > best.score) {
-      best = { index, score };
-    }
+  // Check for win
+  let move = checkWinOrBlock(board, CellStateOption.O)
+  if (move !== null) return move
+
+  // Check for block
+  move = checkWinOrBlock(board, CellStateOption.X)
+  if (move !== null) return move
+
+  // Take center
+  if (board[4] === '') return 4
+
+  // Take opposite corner
+  const corners = [
+    [0, 8],
+    [2, 6]
+  ]
+  for (const [corner, opposite] of corners) {
+    if (board[corner] === 'X' && board[opposite] === '') return opposite
   }
-  return best.index;
-};
+
+  // Take empty corner
+  const cornerIndices = [0, 2, 6, 8]
+  for (const i of cornerIndices) {
+    if (board[i] === '') return i
+  }
+
+  // Take empty side
+  const sideIndices = [1, 3, 5, 7]
+  for (const i of sideIndices) {
+    if (board[i] === '') return i
+  }
+
+  // No move found
+  return -1
+}

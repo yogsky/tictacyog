@@ -1,0 +1,96 @@
+.hud {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: fixed;
+  left: 30px;
+  height: 240px;
+  border: 1px solid white;
+  width: 280px;
+  border-radius: 10px;
+  top: 30px;
+  justify-content: center;
+  gap: 30px;
+  background-color: #494151;
+
+  &.is-thinking {
+    background-image: url("../../assets/thinking.gif");
+    background-position: center;
+    background-size: cover;
+
+    .status,
+    .reset-btn,
+    .github {
+      opacity: 0;
+      transition: all 0.3s ease-in-out;
+      pointer-events: none;
+    }
+  }
+
+  .status {
+    text-shadow: 2px 2px 2px black;
+    color: #3bc1fb;
+    transition: all 0.3s ease-in-out;
+    font-size: 2.2rem;
+    font-weight: 600;
+
+    &.game-over {
+      color: #3bc1fb;
+    }
+  }
+
+  .github {
+    font-size: 1.4rem;
+    color: #bb85ed;
+  }
+}
+
+
+@keyframes shine {
+  0% {
+    left: -100px;
+  }
+
+  20% {
+    left: 100%;
+  }
+
+  100% {
+    left: 100%;
+  }
+}
+
+.reset-btn {
+  position: relative;
+  transition: all 0.25s cubic-bezier(0.2, 0.4, 0, 1);
+  width: 160px;
+  overflow: hidden;
+  height: 55px;
+  border-radius: 4px;
+  background: #3bc1fb;
+  font-size: 2.2rem;
+  border: 2px solid black;
+
+  &:hover {
+    box-shadow: 2px 2px 6px 1px rgba(127, 127, 127, 0.55);
+  }
+
+  &:active {
+    box-shadow: 1px 1px 6px 1px rgba(255, 255, 255, 0.85);
+    font-size: 1.6rem;
+  }
+
+  &:before {
+    content: "";
+    position: absolute;
+    width: 100px;
+    height: 100%;
+    background-image: linear-gradient(120deg,
+        rgba(255, 255, 255, 0) 30%,
+        rgba(255, 255, 255, 0.8),
+        rgba(255, 255, 255, 0) 70%);
+    top: 0;
+    left: -100px;
+    animation: shine 3s infinite linear;
+  }
+}

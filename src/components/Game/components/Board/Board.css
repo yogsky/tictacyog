@@ -1,0 +1,16 @@
+
+
+.board-container {
+  justify-self: center;
+  align-self: center;
+  display: grid;
+  grid-template-columns: 5rem 5rem 5rem;
+  grid-gap: 6rem;
+  perspective: 600px;
+  grid-auto-flow: row;
+  transition: 1.5s;
+}
+
+.board-container.finished {
+  grid-gap: 7rem;
+}

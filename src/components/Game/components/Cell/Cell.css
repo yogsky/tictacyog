@@ -1,0 +1,107 @@
+@keyframes cell-click {
+  0% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(1.1);
+  }
+  75% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+
+:root {
+  --cell-size: 90px;
+  --font-large: 70px;
+  --color-background: #dcdcdc;
+  --highlight-background: #492a65;
+  --player-one-color: rgb(69, 69, 238);
+  --player-two-color: #e84b53;
+  --transition-duration: 1.5s;
+  --shadow-player-one: drop-shadow(0 0 30px var(--player-one-color));
+  --shadow-player-two: drop-shadow(0 0 30px var(--player-two-color));
+}
+
+.cell {
+  cursor: pointer;
+  position: relative;
+  font-family: 'Permanent Marker', 'cursive';
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--cell-size);
+  height: var(--cell-size);
+  font-size: var(--font-large);
+  background: var(--color-background);
+  transition: all var(--transition-duration);
+
+  &.highlight {
+    background-color: var(--highlight-background);
+    transform: scale(1.1);
+  }
+
+  &.filled {
+    transition: 0s;
+    animation: cell-click 0.3s ease-in;
+
+    &.p1,
+    &.p2 {
+      .status {
+        text-shadow: 3px 3px 0px #adadad;
+        color: black;
+      }
+      &:before,
+      &:after {
+        background: currentColor;
+      }
+    }
+    &.p1 {
+      background: var(--player-one-color);
+      filter: var(--shadow-player-one);
+      color: var(--player-one-color);
+    }
+    &.p2 {
+      color: var(--player-two-color);
+      background: var(--player-two-color);
+      filter: var(--shadow-player-two);
+    }
+  }
+
+  &:before,
+  &:after {
+    content: "";
+    position: absolute;
+    outline: 1px solid black;
+    transition: var(--transition-duration);
+  }
+
+  &:before {
+    left: -40px;
+    width: 40px;
+    height: 100%;
+    background: #fff;
+    transform-origin: right;
+    transform: skewY(45deg);
+  }
+
+  &:after {
+    top: -40px;
+    left: 0;
+    height: 40px;
+    width: 100%;
+    background: #f2f2f2;
+    transform-origin: bottom;
+    transform: skewX(45deg);
+  }
+}
+
+.finished {
+  .cell:not(.highlight) {
+    transform: scale(0.9);
+    opacity: 0.4;
+  }
+}
